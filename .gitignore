@@ -259,3 +259,6 @@ paket-files/
 # Python Tools for Visual Studio (PTVS)
 __pycache__/
 *.pyc
+
+# Ignore folder that will contain the imported data files for this project (csv, xml, txt)
+data/
