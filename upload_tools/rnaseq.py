@@ -18,7 +18,7 @@ server_ip = 'localhost'
 port = 27017
 
 #csv file configs
-csv_file_name = 'data/ROSMAP_RNASeq_entrez.csv'
+csv_file_name = '../data/ROSMAP_RNASeq_entrez.csv'
 header = ["PATIENT_ID", "DIAGNOSIS"] #This is temporary (the values will be initalized later)
 
 
@@ -35,11 +35,11 @@ if __name__ == "__main__":
     collection.drop() #empty the collection (drop all documents)
 
     #For each row in the csv, convert it into json format and insert into the collection
-    for each in reader:
+    instance = {}
+    for row in reader:
         #create json form of row
-        row = {}
         for field in header:
-            row[field] = each[field]
+            instance[field] = row[field]
 
         #upload onto collection
         collection.insert(row)
