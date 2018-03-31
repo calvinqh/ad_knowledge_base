@@ -8,7 +8,11 @@
     Each field in the csv will act as a column.
     Each row will become a record.
 '''
-from cassandra.cluster import cluster
+from cassandra.cqlengine import columns
+from cassandra.cqlengine.models import Model
+from cassandra.cqlengine.management import sync_table, drop_table
+from cassandra.cqlengine import connection
+
 import csv
 import json
 
@@ -18,29 +22,35 @@ keyspace = 'mylittlekeyspace'
 port = 27017
 
 #csv file configs
-csv_file_name = 'data/patients.csv'  #The file where the data is read from
-new_table_name = 'test'              #table name where the data will be inserted
-header = ["PATIENT_ID", "DIAGNOSIS"] #This is temprary (the values will be initalized later)
+csv_file_name = '../data/patients.csv'  #The file where the data is read from
+header = ['patient_id', 'age', 'gender', 'education'] #This is temprary (the values will be initalized later)
+
+
+class Patient(Model):
+    __keyspace__ = keyspace #tells which keyspace to store this model in
+
+    #List of model fields
+    patient_id = columns.Text(primary_key=True)
+    age = columns.Integer()
+    gender = columns.Text()
+    education = columns.Text()
 
 
 if __name__ == "__main__":
-
-    cluster = Cluster(server_ip)    #Cluster reference
-    session = cluster.connect(keyspace) #Session reference to specific key space
-
-
-    #TODO: clear the table data
-    #collection.drop()
-
-    #Upload csv file into specified table name
-    session.execute("""
-        COPY %table_name FROM %csv_file_name WITH HEADER=true;
-        """,
-        {'table_name':table_name, 'csv_file_name':csv_file_name}
-    )
-
-    """
     
+    #Create connection to server
+    connection.setup([server_ip], "cqlengine", protocol_version=3)
     
+    drop_table(Patient) #Drop table if it exist 
+    sync_table(Patient) #In this case, it will create the table
 
-    """
+    instance = {}
+    csvFile = open(csv_file_name) #Load csvfile stream
+    reader = csv.DictReader( csvFile ) #initalize csv reader with file stream
+    header = reader.fieldnames #Contains the header of the csv (field/column names)
+
+    #Insert each row into database
+    for row in reader:
+        for field in header:
+            instance[field] = row[field]
+        Patient.create(**instance)
