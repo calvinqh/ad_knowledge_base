@@ -8,8 +8,8 @@
     Each field in the csv will act as a column.
     Each row will become a record.
 '''
-from cassandra.cqlengine import columns
-from cassandra.cqlengine.models import Model
+from ..models.patient import Patient 
+
 from cassandra.cqlengine.management import sync_table, drop_table
 from cassandra.cqlengine import connection
 
@@ -22,22 +22,13 @@ keyspace = 'mylittlekeyspace'
 port = 27017
 
 #csv file configs
-csv_file_name = '../data/patients.csv'  #The file where the data is read from
+csv_file_name = 'ad_knowledge_base/data/patients.csv'  #The file where the data is read from
 header = ['patient_id', 'age', 'gender', 'education'] #This is temprary (the values will be initalized later)
 
 
-class Patient(Model):
-    __keyspace__ = keyspace #tells which keyspace to store this model in
-
-    #List of model fields
-    patient_id = columns.Text(primary_key=True)
-    age = columns.Integer()
-    gender = columns.Text()
-    education = columns.Text()
-
-
 if __name__ == "__main__":
-    
+
+
     #Create connection to server
     connection.setup([server_ip], "cqlengine", protocol_version=3)
     
