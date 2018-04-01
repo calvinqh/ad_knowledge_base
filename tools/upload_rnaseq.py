@@ -12,6 +12,8 @@
 from pymongo import MongoClient
 import csv
 import json
+import re
+import bson
 
 #database configs
 server_ip = 'localhost'
@@ -33,14 +35,22 @@ if __name__ == "__main__":
     db = client.values  #retrieve the database Values on the cluster
     collection = db.rna #retrieve the collection RNA from Values database
     collection.drop() #empty the collection (drop all documents)
+    
+    counter = 1
 
     #For each row in the csv, convert it into json format and insert into the collection
-    instance = {}
     for row in reader:
+        instance = {}
         #create json form of row
         for field in header:
-            instance[field] = row[field]
+            if (re.match("^\d+?\.\d+?$", row[field]) is not None):
+                instance[field] = float(row[field])
+            else:
+                instance[field] = row[field]
+        if(counter > 0):
+            print(instance)
+            counter-=1
 
         #upload onto collection
-        collection.insert(row)
+        collection.insert(instance)
 
