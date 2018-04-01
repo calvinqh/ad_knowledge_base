@@ -18,7 +18,7 @@ server_ip = 'localhost'
 port = 27017
 
 #csv file configs
-csv_file_name = '../data/ROSMAP_RNASeq_entrez.csv'
+csv_file_name = 'ad_knowledge_base/data/ROSMAP_RNASeq_entrez.csv'
 header = ["PATIENT_ID", "DIAGNOSIS"] #This is temporary (the values will be initalized later)
 
 
