@@ -262,3 +262,4 @@ __pycache__/
 
 # Ignore folder that will contain the imported data files for this project (csv, xml, txt)
 data/
+PythonApplication1/PythonApplication1/data/
