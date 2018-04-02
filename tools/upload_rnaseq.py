@@ -19,14 +19,10 @@ import bson
 server_ip = 'localhost'
 port = 27017
 
-#csv file configs
-csv_file_name = 'ad_knowledge_base/data/ROSMAP_RNASeq_entrez.csv'
-header = ["PATIENT_ID", "DIAGNOSIS"] #This is temporary (the values will be initalized later)
+def upload_rosmaprna(db_ip, db_port):
+    client = MongoClient(db_ip, db_port) #Client used to connect to cluster
 
-
-if __name__ == "__main__":
-
-    client = MongoClient(server_ip, port) #Client used to connect to cluster
+    csv_file_name = 'ad_knowledge_base/data/ROSMAP_RNASeq_entrez.csv'
 
     csvFile = open(csv_file_name) #Load csvfile stream
     reader = csv.DictReader( csvFile ) #initalize csv reader with file stream
@@ -36,8 +32,6 @@ if __name__ == "__main__":
     collection = db.rna #retrieve the collection RNA from Values database
     collection.drop() #empty the collection (drop all documents)
     
-    counter = 1
-
     #For each row in the csv, convert it into json format and insert into the collection
     for row in reader:
         instance = {}
@@ -47,10 +41,10 @@ if __name__ == "__main__":
                 instance[field] = float(row[field])
             else:
                 instance[field] = row[field]
-        if(counter > 0):
-            print(instance)
-            counter-=1
 
         #upload onto collection
         collection.insert(instance)
 
+
+if __name__ == "__main__":
+    upload_rosmaprna(server_ip, port)
