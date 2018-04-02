@@ -1,6 +1,10 @@
 '''
     A script that will upload patients.csv onto a cassandra cluster keyspace.
-    This script can be generalized for any csv file.
+    The script contains a function to upload the csv onto a Cass cluster keyspace
+    This function, with modification, can be generalized for any csv file.
+
+    Contains:
+    upload_patient_information(db_ip:string, db_port:int=0000)
 
     Instructions: 
     User must set the server ip, port and keyspace for the cassandra cluster and keyspace.

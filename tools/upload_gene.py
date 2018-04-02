@@ -1,6 +1,10 @@
 '''
     A script that will upload entrez_ids_genesymbol.csv onto a mongo cluster.
-    This script can be generalized for any csv file.
+    The script contains the function to upload the csv onto specific cluster
+    This function, with modification, can be generalized for any csv file.
+
+    Contains:
+    upload_gene_information(db_ip:string, db_port:int)
 
     Instructions: 
     User must set the server ip and port for the mongo cluster.
@@ -21,8 +25,9 @@ port = 27017
 
 '''
     The purpose of this function is to upload entrez_ids_genesymbol csv file to a Mongodb.
-    Data is stored in a db called values
-    The collection the data is stored in is gene
+    The data is stored in the values db, in the gene collection
+    @param db_ip:string, the ip of the mongodb
+    @param db_port:int, the port of the mongodb
 '''
 def upload_gene_information(db_ip, db_port):
     client = MongoClient(db_ip, db_port) #Client used to connect to cluster

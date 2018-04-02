@@ -1,6 +1,10 @@
 '''
     A script that will upload ROSMAP_RNASeq_entrez.csv onto a mongo cluster.
-    This script can be generalized for any csv file.
+    The script contains the function to upload the csv onto specific cluster
+    This function, with modification, can be generalized for any csv file.
+
+    Contains:
+    upload_rosmaprna(db_ip:string, db_port:int)
 
     Instructions: 
     User must set the server ip and port for the mongo cluster.
@@ -19,6 +23,12 @@ import bson
 server_ip = 'localhost'
 port = 27017
 
+'''
+    The purpose of this function is to upload ROSMAP_RNASeq_entrez csv to Mongodb
+    The data is stored in the values db, in the rna collection
+    @param db_ip:string, the ip of the mongodb
+    @param db_port:int, the port of the mongodb
+'''
 def upload_rosmaprna(db_ip, db_port):
     client = MongoClient(db_ip, db_port) #Client used to connect to cluster
 
