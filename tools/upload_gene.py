@@ -19,19 +19,17 @@ import bson
 server_ip = 'localhost'
 port = 27017
 
-#csv file configs
-csv_file_name = 'ad_knowledge_base/data/entrez_ids_genesymbol.csv'
-header = ["entrez_id", "gene_symbol", "gene name"] #This is temporary (the values will be initalized later)
-
 '''
-    Uploads entrez_ids_genesymbol csv file to a Mongodb.
+    The purpose of this function is to upload entrez_ids_genesymbol csv file to a Mongodb.
     Data is stored in a db called values
     The collection the data is stored in is gene
 '''
-def upload_gene_information(db_ip, db_port, file_name):
+def upload_gene_information(db_ip, db_port):
     client = MongoClient(db_ip, db_port) #Client used to connect to cluster
 
-    csvFile = open(file_name) #Load csvfile stream
+    csv_file_name = 'ad_knowledge_base/data/entrez_ids_genesymbol.csv'
+
+    csvFile = open(csv_file_name) #Load csvfile stream
     reader = csv.DictReader( csvFile ) #initalize csv reader with file stream
     header = reader.fieldnames #Contain the header of the csv (field names)
 
@@ -51,4 +49,4 @@ def upload_gene_information(db_ip, db_port, file_name):
 
 
 if __name__ == "__main__":
-    upload_gene_information(server_ip, port, csv_file_name)
+    upload_gene_information(server_ip, port)
