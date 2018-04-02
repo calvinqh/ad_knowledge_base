@@ -84,11 +84,6 @@ def getGeneReport(entrez):
     return result
     
 
-def mainloop():
-    while(True):
-        cmd = input(">>")
-
 
 if __name__ == "__main__":
     getGeneReport(197322)  
-    #mainloop()
