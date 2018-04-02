@@ -23,9 +23,7 @@ port = 27017
 csv_file_name = 'ad_knowledge_base/data/entrez_ids_genesymbol.csv'
 header = ["entrez_id", "gene_symbol", "gene name"] #This is temporary (the values will be initalized later)
 
-
-if __name__ == "__main__":
-
+def upload_gene_information():
     client = MongoClient(server_ip, port) #Client used to connect to cluster
 
     csvFile = open(csv_file_name) #Load csvfile stream
@@ -46,3 +44,6 @@ if __name__ == "__main__":
         #upload onto collection
         collection.insert(instance)
 
+
+if __name__ == "__main__":
+    upload_gene_information()
