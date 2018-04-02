@@ -83,7 +83,18 @@ def getGeneReport(entrez):
             result[doc['_id']] = doc #_id contains the disease name
     return result
     
+def getGeneDetails(gene_symbol):
+    db = client.values #retrieve reference to values database from client
+    collection = db.gene #retrieve reference to collection from database
 
+    cursor = collection.find({"gene_symbol":gene_symbol})
+    
+    #return the result of the collection query search
+    for doc in cursor:
+        print(doc)
+        return doc
 
 if __name__ == "__main__":
-    getGeneReport(197322)  
+    #getGeneReport(197322)  
+    getGeneDetails("SLC27A5")
+
