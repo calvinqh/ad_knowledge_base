@@ -23,10 +23,15 @@ port = 27017
 csv_file_name = 'ad_knowledge_base/data/entrez_ids_genesymbol.csv'
 header = ["entrez_id", "gene_symbol", "gene name"] #This is temporary (the values will be initalized later)
 
-def upload_gene_information():
-    client = MongoClient(server_ip, port) #Client used to connect to cluster
+'''
+    Uploads entrez_ids_genesymbol csv file to a Mongodb.
+    Data is stored in a db called values
+    The collection the data is stored in is gene
+'''
+def upload_gene_information(db_ip, db_port, file_name):
+    client = MongoClient(db_ip, db_port) #Client used to connect to cluster
 
-    csvFile = open(csv_file_name) #Load csvfile stream
+    csvFile = open(file_name) #Load csvfile stream
     reader = csv.DictReader( csvFile ) #initalize csv reader with file stream
     header = reader.fieldnames #Contain the header of the csv (field names)
 
@@ -46,4 +51,4 @@ def upload_gene_information():
 
 
 if __name__ == "__main__":
-    upload_gene_information()
+    upload_gene_information(server_ip, port, csv_file_name)
