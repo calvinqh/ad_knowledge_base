@@ -4,6 +4,12 @@ from cassandra.cqlengine import connection
 
 from pymongo import MongoClient
 
+'''
+    Return a dict containing information about patients
+    @param _id:int, the patient id
+    @return dict, a dictionary containing patient information
+                <patient_id, age, gender, education, diagnosis>
+'''
 def getPatientReport(_id):
     #Connection setup
     connection.setup(['localhost'], "cqlengine", protocol_version=3)
@@ -26,11 +32,15 @@ def getPatientReport(_id):
     rosmap_cursor = rosmap_collection.find({'PATIENT_ID':_id})
     patient_doc = rosmap_cursor.next()
 
+    #Create dict contains patient information
     patient_information = {}
+    #read information from cassandra results
     for key,value in patient.items():
         patient_information[key] = value
+    #read diagnosis infromation from mongo results
     patient_information['diagnosis'] = patient_doc['DIAGNOSIS']
-    print(patient_information)
+    
+    #print(patient_information)
     return patient_information
     
 
