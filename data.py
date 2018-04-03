@@ -1,14 +1,14 @@
 import pandas as pd
+import cassandra
 
-from py2neo import Graph, Path, Node, Relationship
+from pymongo import Connection
+from py2neo import Graph, Node, Relationship
 
-def n_order_genes(gene_interactors, gene):
+def n_order_genes(gene_interactors, gene, all_genes):
     graph = Graph(password = '1')
     interact = graph.begin()
     a = gene_interactors["interactor_A"]
     b = gene_interactors["interactor_B"]
-    n_order = []
-    i = 0
 
     for i in range(a.shape[0]):
         interactor_a = str(a[i])
@@ -16,40 +16,44 @@ def n_order_genes(gene_interactors, gene):
         if interactor_a == gene or interactor_b == gene:
             first = Node("interactor", name = interactor_a)
             second = Node("interactor", name = interactor_b)
-
             graph.merge(Relationship(first, "INTERACTS WITH", second))
 
-            if interactor_a == gene:
-                n_order.insert(i, interactor_b)
-                i = i+1
-                #print interactor_b
-            elif interactor_b == gene:
-                n_order.insert(i, interactor_a)
-                i = i+1
-                #print interactor_a
+    print ""
+    print "INTERACTING GENES:"
+    for i in graph.match(rel_type = "INTERACTS WITH"):
+        if i.start_node()["name"] == gene:
+            print find_name(i.end_node()["name"], all_genes)
+        elif i.end_node()["name"] == gene:
+            print find_name(i.start_node()["name"], all_genes)
 
-    #print("NUMBER OF GENES INTERACTING WITH {0}: {1}".format(gene, n))
-    return n_order
 
-def gene_id(entrez_and_genes, gene):
-    name = gene.upper()
-    id = entrez_and_genes["entrez_id"]
+def make_gene_table(entrez_and_genes):
+
+    connect = Connection('localhost', 27017)
+    db = connect.collection
+    all_genes = db.all_genes
+    ids = entrez_and_genes["entrez_id"]
     genes = entrez_and_genes["gene_symbol"]
+    print "Inserting data into MongoDB..."
+    for i in range(ids.shape[0]):
+        all_genes.update({'entrez':str(ids[i]), 'gene':genes[i]}, {'entrez':str(ids[i]), 'gene':genes[i]}, upsert = True)
 
-    for i in range(id.shape[0]):
-        if genes[i].upper() == name:
-            return str(id[i])
+    return all_genes
 
-    return ""
+def find_id(gene, all_genes):
+    row = all_genes.find({"gene":gene})
+    for name in list(row):
+        gene_id = name["entrez"]
 
-def gene_name(entrez_and_genes, g_ids):
-    id = entrez_and_genes["entrez_id"]
-    genes = entrez_and_genes["gene_symbol"]
+    return gene_id
 
-    for i in range(id.shape[0]):
-        for k in range(len(g_ids)):
-            if str(id[i]) == g_ids[k]:
-                print str(genes[i])
+def find_name(id, all_genes):
+    row = all_genes.find({"entrez":id})
+    gene = id
+    for name in list(row):
+        gene = name["gene"]
+
+    return gene
 
     
 def main():
@@ -65,13 +69,23 @@ def main():
     if press == 1:
         gene_interactors = pd.read_csv("PPI.csv")
         entrez_and_genes = pd.read_csv("entrez_ids_genesymbol.csv")
-        gene = input("ENTER A GENE: ")
-        gene_num = gene_id(entrez_and_genes, gene)
-        interacting_genes = n_order_genes(gene_interactors, gene_num)
+        gene = raw_input("ENTER A GENE: ")
+        all_genes = make_gene_table(entrez_and_genes)
+        find_more = True
 
-        print ""
-        print "INTERACTING GENES:"
-        gene_name(entrez_and_genes, interacting_genes)
+        while find_more == True:
+            gene_num = find_id(gene, all_genes)
+            interacting_genes = n_order_genes(gene_interactors, gene_num, all_genes)
+
+            print "Press[0] to go BACK"
+            print "Press [1] to enter a different GENE"
+            again = int(input("Enter [0/1]   "))
+            while again != 1 and again != 0:
+                again = raw_input("Enter [0/1]   ")
+            if again == 0:
+                find_more = False
+            elif again == 1:
+                gene = raw_input("ENTER A GENE: ")
 
 
     elif press == 2:
