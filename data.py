@@ -1,74 +1,87 @@
 import pandas as pd
+import cassandra
 
-from py2neo import Graph, Path, Node, Relationship
+from pymongo import Connection
+from py2neo import Graph, Node, Relationship
 
 '''
-    Return all genes that have a interaction with the given gene (entrez id)
+    Displays all genes that that have a interaction with the given gene (entrez id)
     @param gene_interactors:dataframe, the relationship between interacting genes
     @param gene:string, the entrez id we want to find the interacting genes for
-    @return list, the list of entrez ids that interact with the given gene (entrez id) 
+    @param all_genes:collection, a mongo collection containing information about genes
+    @return None.
 '''
-def n_order_genes(gene_interactors, gene):
+def n_order_genes(gene_interactors, gene, all_genes):
     graph = Graph(password = '1')
     interact = graph.begin()
     a = gene_interactors["interactor_A"] #Contains the series interactor A
     b = gene_interactors["interactor_B"] #Contains the series interactor B
-    n_order = [] #Contains all genes interacting with the given gene
-    i = 0 #Index of interacting pair
 
+    #Upload gene interactor data onto Neo4j database
     for i in range(a.shape[0]):
         interactor_a = str(a[i]) 
         interactor_b = str(b[i])
         if interactor_a == gene or interactor_b == gene:
             first = Node("interactor", name = interactor_a)
             second = Node("interactor", name = interactor_b)
-
             graph.merge(Relationship(first, "INTERACTS WITH", second))
 
-            #insert the gene that interacts with the given gene
-            if interactor_a == gene:
-                n_order.insert(i, interactor_b)
-                i = i+1
-                #print interactor_b
-            elif interactor_b == gene:
-                n_order.insert(i, interactor_a)
-                i = i+1
-                #print interactor_a
-
-    #print("NUMBER OF GENES INTERACTING WITH {0}: {1}".format(gene, n))
-    return n_order
+    #Search for genes that interactor with the given gene
+    print ""
+    print "INTERACTING GENES:"
+    #Loop through every edge/relationship with the tag INTERACTS WITH
+    for i in graph.match(rel_type = "INTERACTS WITH"):
+        if i.start_node()["name"] == gene: #If node1 matches gene
+            print find_name(i.end_node()["name"], all_genes) 
+        elif i.end_node()["name"] == gene: #If node 2 matches gene
+            print find_name(i.start_node()["name"], all_genes)
 
 '''
-    Return the gene id associated with the given gene name
-    @param entrez_and_genes:dataframe, information about genes
-    @param gene:string, the gene we want to find the entrez id for
-    @return string, the entrez id for the given gene
+    Uploads entrez and gene name / symbol onto a mongo database
+    @param entrez_and_genes:dataframe, a dataframe containing information about
+                                        entrez ids, gene name, gene symbol
+    @return mongo_collection, a reference to the collection with entrez and gene information 
 '''
-def gene_id(entrez_and_genes, gene):
-    name = gene.upper()
-    id = entrez_and_genes["entrez_id"]
-    genes = entrez_and_genes["gene_symbol"]
+def make_gene_table(entrez_and_genes):
 
-    for i in range(id.shape[0]):
-        if genes[i].upper() == name:
-            return str(id[i])
+    connect = Connection('localhost', 27017)
+    db = connect.collection
+    all_genes = db.all_genes #reference to collection to gene information
+    ids = entrez_and_genes["entrez_id"] #reference entrez id series
+    genes = entrez_and_genes["gene_symbol"] #reference gene series
+    print "Inserting data into MongoDB..."
+    #Insert into databse, if duplicates exists update duplicate
+    for i in range(ids.shape[0]):
+        all_genes.update({'entrez':str(ids[i]), 'gene':genes[i]}, {'entrez':str(ids[i]), 'gene':genes[i]}, upsert = True)
 
-    return ""
+    return all_genes
 
 '''
-    Display the corresponding gene symbol for the given entrez id list (gene id)
-    @param entrez_and_genes:dataframe, information about genes (entrez_id, gene symbol ...)
-    @param g_ids:list, a list of entrez ids (gene ids) that will have their symbol displayed
-    @return None
+    Searches for entrez id given gene name and mongo gene collection.
+    @param gene:string, the gene name the function is searching for
+    @param all_genes:mongo collection, the collection search is performed on
+    @return int, the corresponding entrez id for the gene
 '''
-def gene_name(entrez_and_genes, g_ids):
-    id = entrez_and_genes["entrez_id"]
-    genes = entrez_and_genes["gene_symbol"]
+def find_id(gene, all_genes):
+    row = all_genes.find({"gene":gene})
+    for name in list(row):
+        gene_id = name["entrez"]
 
-    for i in range(id.shape[0]):
-        for k in range(len(g_ids)):
-            if str(id[i]) == g_ids[k]:
-                print str(genes[i])
+    return gene_id
+
+'''
+    Searches for gene name given entrez id of gene and mongo gene collection
+    @param id:int, the entrez id
+    @param all_genes:mongo_collection, the collection containing docs with gene info
+    @return string, gene name for corresponding entrez id
+'''
+def find_name(id, all_genes):
+    row = all_genes.find({"entrez":id})
+    gene = id
+    for name in list(row):
+        gene = name["gene"]
+
+    return gene
 
     
 '''
@@ -87,13 +100,23 @@ def main():
     if press == 1:
         gene_interactors = pd.read_csv("PPI.csv")
         entrez_and_genes = pd.read_csv("entrez_ids_genesymbol.csv")
-        gene = input("ENTER A GENE: ")
-        gene_num = gene_id(entrez_and_genes, gene)
-        interacting_genes = n_order_genes(gene_interactors, gene_num)
+        gene = raw_input("ENTER A GENE: ")
+        all_genes = make_gene_table(entrez_and_genes)
+        find_more = True
 
-        print ""
-        print "INTERACTING GENES:"
-        gene_name(entrez_and_genes, interacting_genes)
+        while find_more == True:
+            gene_num = find_id(gene, all_genes)
+            interacting_genes = n_order_genes(gene_interactors, gene_num, all_genes)
+
+            print "Press[0] to go BACK"
+            print "Press [1] to enter a different GENE"
+            again = int(input("Enter [0/1]   "))
+            while again != 1 and again != 0:
+                again = raw_input("Enter [0/1]   ")
+            if again == 0:
+                find_more = False
+            elif again == 1:
+                gene = raw_input("ENTER A GENE: ")
 
 
     elif press == 2:
