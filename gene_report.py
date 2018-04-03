@@ -1,12 +1,3 @@
-'''
-    The CLI for the user to query the ad knowledge base.
-'''
-
-'''
-    Returns the average expression values for AD/MCI/NCI for the given entrez id
-    @param entrez, the entrez id 
-'''
-
 from pymongo import MongoClient
 server_ip = 'localhost'
 port = 27017
