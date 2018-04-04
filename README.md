@@ -18,7 +18,7 @@ ad_knowledge_base/
 		upload_patients.py
 		upload_rnaseq.py
 		upload_gene.py
-		upload_interactors.py
+		upload_gene_interactors.py
 	data/ #Add all csv,xml,and txt files here
 ```
 
@@ -77,4 +77,12 @@ From parent directory of ad_knowledge_base/ the following command will run a cli
 patient <name:string>
 ```
 Retrieves all patient infromation.
+
+
+## Data structure
+```
+![alt text](https://github.com/adam-p/markdown-here/raw/master/src/common/images/icon48.png "Logo Title Text 1")
+```
+
+![](docs/dataflow.png)
 
