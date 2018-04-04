@@ -4,6 +4,8 @@ from cassandra.cqlengine import connection
 
 from pymongo import MongoClient
 
+from py2neo import Graph, authenticate
+from py2neo.packages.httpstream import http
 
 '''
     A interface to retrieve information about Alzheimer Disease Knowledge Base
@@ -23,6 +25,23 @@ class ADKnowledgeBase:
         connection.setup([cass_conf['ip']],cass_conf['default_keyspace'], protocol_version=3)
         #setup connection to neo4j database
         self.neo_client = None
+        self.setup_neo(neo_conf)
+
+    def setup_neo(self, conf):
+        http.socket_timeout = 10000000
+       
+        user = conf['user']
+        pw = conf['pw']
+        host = conf['host']
+        port = conf['http_port']
+        db = conf['db_name']
+        graph = conf['graph_name']
+
+        auth_uri = '{}:{}'.format(host,port)
+        authenticate(auth_uri, user, pw)
+
+        db_uri = 'http://{}:{}@{}:{}/{}/{}'.format(user,pw,host,port,db,graph)
+        self.graph = Graph(db_uri, bolt=False)
 
     '''
         Returns a dict containing information about patients
@@ -170,14 +189,15 @@ class ADKnowledgeBase:
         @param all_genes:collection, a mongo collection containing information about genes
         @return list, a list containing all genes that interact with the given gene
     '''
-    def getNOrderGenes(self, gene, all_genes):
-        graph = Graph(password = '1')
+    def getNOrderGenes(self, gene):
         interactors = []
         #Search for genes that interact with the given entrez_id
-        for i in graph.match(rel_type = "INTERACTS WITH"):
+        for i in self.graph.match(rel_type = "INTERACTS_WITH"):
             if i.start_node()['name'] == gene:
+                print(i.start_node['name'])
                 interactors.append(find_name(i.end_node()["name"]))
             elif i.end_node()['name'] == gene:
+                print(i.end_node['name'])
                 interactors.append(find_name(i.start_node()['name']))
         return interactors
 
