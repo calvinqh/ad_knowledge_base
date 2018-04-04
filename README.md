@@ -53,7 +53,7 @@ COPY patient_info.patient FROM '<RELATIVE PATH TO CSV>/patients.csv' WITH HEADER
 #### Neo4j```(PPI.csv, )```
 
 In the neo4j conf file, disable the following line by adding a comment or setting the value to false. This will allow you to provide an absolute path to upload the csv.
-```dbms.security.allow_csv_import_from_file_urls=true```
+```#dbms.directories.import=import```
 
 If you did not disable this feature, you will have to put the csv file into the import folder of the database folder.
 
