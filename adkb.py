@@ -61,16 +61,85 @@ class ADKnowledgeBase:
         @return dict, the mean and std for AD, MCI, and NCI
     '''
     def getGeneReport(self,entrez):
-        pass
+        db = self.mongo_client.values #use client to retrieve values database
+        collection = db.rna #retrieve reference to rna collection
+        
+        cursors = [] #contian cursor to all aggregate query results
+        
+        #References to labels, the database saves label information in the form of numbers
+        disease_labels = {
+            '1': 'NCI',
+            '(2,3)': 'MCI',
+            '(4,5)': 'AD',
+            '6': 'Other dementia'
+        }
 
+        #Each query filters collection by disease label number
+        for key,value in disease_labels.items():
+
+            #For keys that are tuples, match stage requires $or operator
+            match_by_tuple = False
+            if len(key) > 1:
+                match_by_tuple = True
+            if(match_by_tuple):
+                cursors.append(collection.aggregate([
+                    {
+                        '$match': { #filter documents that match the following
+                            "$or": [
+                                {
+                                    "DIAGNOSIS": key[0], #search with first label key
+                                    "DIAGNOSIS": key[1]  #search with second label key
+                                } 
+                            ]
+                        }
+                    },
+                    {
+                        '$group': { #how aggreate will be formated
+                            '_id':value, #disease name
+                            'avg_entrez': { '$avg': '$'+str(entrez)}, #calc average
+                            'std_entrez': { '$stdDevPop': '$'+str(entrez)} #calc std by popu
+                        }
+                    }
+                ]))
+            else:
+                cursors.append(collection.aggregate([
+                    {
+                        '$match': { #filter documents that match the following
+                            "DIAGNOSIS": key #search by label key
+                        }
+                    },
+                    {
+                        '$group': { #how the aggregate will be formated
+                            '_id':value, #disease name
+                            'avg_entrez': { '$avg': '$'+str(entrez)}, #calc avg
+                            'std_entrez': { '$stdDevPop': '$'+str(entrez)} #calc std by popu
+                        }
+                    }
+                ]))
+
+        #create dictionary maping disease name to aggregate results
+        result = {}
+        for cursor in cursors:
+            for doc in cursor:
+                result[doc['_id']] = doc #_id contains the disease name
+        return result
+     
     '''
         Returns information about a specific gene given gene_symbol.
         @param gene_symbol: The gene symbol for a gene
         @return doc/dict, general information about a gene
     '''
-    def geteGeneDetails(self,gene_symbol):
-        pass
+    def getGeneDetails(self,gene_symbol):
+        db = self.mongo_client.values #retrieve reference to values database from client
+        collection = db.gene #retrieve reference to collection from database
 
+        cursor = collection.find({"gene_symbol":gene_symbol})
+        
+        #return the result of the collection query search
+        for doc in cursor:
+            print(doc)
+            return doc
+        return None
     '''
         Uploads and retrieves all genes that interact with the given gene
         @param gene_interactors:dataframe, relationship between genes (interactions)
