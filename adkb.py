@@ -31,8 +31,10 @@ class ADKnowledgeBase:
                     <patient_id, age, gender, education, diagnosis>
     '''
     def getPatientReport(self,p_id):
-        db = self.mongo_client.values
-        rosmap_collection = db.rna
+        db = self.mongo_client.values #Retrieve db reference from client
+        rosmap_collection = db.rna #Retrieve collection from db
+        
+        #Search cassandra fro patient record
         patient = None
         try:
             patient = Patient.get(patient_id=p_id)
@@ -45,6 +47,8 @@ class ADKnowledgeBase:
         #Search for corresponding rosmap doc for patient
         rosmap_cursor = rosmap_collection.find({'PATIENT_ID':p_id})
         patient_doc = rosmap_cursor.next()
+
+        #Create a dict containing patient information
         patient_information = {}
         #Read information from cassandra results
         for key,value in patient.items():
@@ -129,7 +133,7 @@ class ADKnowledgeBase:
         @param gene_symbol: The gene symbol for a gene
         @return doc/dict, general information about a gene
     '''
-    def getGeneDetails(self,gene_symbol):
+    def getGeneDetailsBySymbol(self,gene_symbol):
         db = self.mongo_client.values #retrieve reference to values database from client
         collection = db.gene #retrieve reference to collection from database
 
@@ -137,35 +141,64 @@ class ADKnowledgeBase:
         
         #return the result of the collection query search
         for doc in cursor:
-            print(doc)
+            #print(doc)
             return doc
         return None
+
+    '''
+        Returns information about a specific gene given entrez_id.
+        @param entrez_id:string The entrez id for a gene
+        @return doc/dict, general information about a gene
+    '''
+    def getGeneDetailsByEntrez(self,entrez_id):
+        db = self.mongo_client.values #retrieve reference to values database from client
+        collection = db.gene #retrieve reference to collection from database
+
+        cursor = collection.find({"entrez_id":entrez_id})
+        
+        #return the result of the collection query search
+        for doc in cursor:
+            #print(doc)
+            return doc
+        return None
+
+
+
     '''
         Uploads and retrieves all genes that interact with the given gene
-        @param gene_interactors:dataframe, relationship between genes (interactions)
         @param gene:string, the entrez id of a gene
         @param all_genes:collection, a mongo collection containing information about genes
+        @return list, a list containing all genes that interact with the given gene
     '''
-    def n_order_genes(self,gene_interactors, gene, all_genes):
-        pass
+    def getNOrderGenes(self, gene, all_genes):
+        graph = Graph(password = '1')
+        interactors = []
+        #Search for genes that interact with the given entrez_id
+        for i in graph.match(rel_type = "INTERACTS WITH"):
+            if i.start_node()['name'] == gene:
+                interactors.append(find_name(i.end_node()["name"]))
+            elif i.end_node()['name'] == gene:
+                interactors.append(find_name(i.start_node()['name']))
+        return interactors
 
     '''
-        Searches for entrez id given gene name and mongo gene collection
+        Searches for entrez id given gene symbol 
         @param id:int, the entrez id of a gene
-        @param all_genes:mongo collection, the colletion containing docs with gene info
         @return string, gene name for corresponding entrez id
     '''
-    def find_id(self,gene, all_genes):
-        pass
+    def find_id(self,gene):
+        doc = self.getGeneDetailsBySymbol(gene_symbol)
+        if doc is not None:
+            return doc['entrez_id']
+        return None
 
     '''
-        Searches for gene name given entrez id of gene and mongo gene collection
-        @param id:int, the entrez id
-        @param all_genes:mongo_collection, the collection containing docs with gene info
-        @return string, gene name for corresponding entrez id
+        Searches for gene name given entrez id of gene
+        @param entrez_id:int, the entrez id
+        @return string, gene symbol for corresponding entrez id
     '''
-    def find_name(self,id, all_genes):
-        pass
-
-
-
+    def find_name(self,entrez_id):
+        doc = self.getGeneDetailsByEntrez(entrez_id)
+        if doc is not None:
+            return doc['gene_symbol']
+        return None
