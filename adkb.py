@@ -1,3 +1,10 @@
+from models.patient import Patient
+
+from cassandra.cqlengine import connection
+
+from pymongo import MongoClient
+
+
 '''
     A interface to retrieve information about Alzheimer Disease Knowledge Base
 '''
@@ -9,11 +16,11 @@ class ADKnowledgeBase:
         @param cass_conf:dict, dict containing cluster and default keyspace of cass database
         @param neo_conf:dict, dict containing neo configs
     '''
-    def __init__(self, mongo_conf, cassandra_conf, neo_conf):
+    def __init__(self, mongo_conf, cass_conf, neo_conf):
         #Create mongo client
         self.mongo_client = MongoClient(mongo_conf['ip'],mongo_conf['port'])
         #Setup default connection to cassandra cluster
-        connection.setup([cass_conf['ip'],cass_conf['default_keyspace'], protocol_version=3])
+        connection.setup([cass_conf['ip']],cass_conf['default_keyspace'], protocol_version=3)
         #setup connection to neo4j database
         self.neo_client = None
 
@@ -24,7 +31,28 @@ class ADKnowledgeBase:
                     <patient_id, age, gender, education, diagnosis>
     '''
     def getPatientReport(self,p_id):
-        pass
+        db = self.mongo_client.values
+        rosmap_collection = db.rna
+        patient = None
+        try:
+            patient = Patient.get(patient_id=p_id)
+            print("Patient found.")
+        except:
+            print("Patient does not exist.")
+
+        #print(patient.items())
+        
+        #Search for corresponding rosmap doc for patient
+        rosmap_cursor = rosmap_collection.find({'PATIENT_ID':p_id})
+        patient_doc = rosmap_cursor.next()
+        patient_information = {}
+        #Read information from cassandra results
+        for key,value in patient.items():
+            patient_information[key] = value
+        #read diagnosis information from mongo results
+        patient_information['diagnosis'] = patient_doc['DIAGNOSIS']
+
+        return patient_information
 
     '''
         Given the entrez id for a gene
