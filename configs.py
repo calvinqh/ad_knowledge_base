@@ -3,7 +3,7 @@ class DBConfig:
     @staticmethod
     def getMongoConfig():
         conf = {
-                'ip':'localhost',
+                'host':'localhost',
                 'port':27017
         }
         
@@ -12,7 +12,7 @@ class DBConfig:
     @staticmethod
     def getCassandraConfig():
         conf = {
-            'ip':'localhost',
+            'host':'localhost',
             'default_keyspace':'cqlengine'
         }
         return conf
