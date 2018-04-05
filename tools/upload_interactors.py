@@ -2,16 +2,18 @@ import pandas as pd
 from py2neo import Graph, Node, Relationship, authenticate
 from py2neo.packages.httpstream import http
 
-def upload_gene_interactions(conf):
+from ..configs import DBConfig as c
+
+def upload_gene_interactions(neo_conf):
    
     http.socket_timeout = 10000000
    
-    user = conf['user']
-    pw = conf['pw']
-    host = conf['host']
-    port = conf['http_port']
-    db = conf['db_name']
-    graph = conf['graph_name']
+    user = neo_conf['user']
+    pw = neo_conf['pw']
+    host = neo_conf['host']
+    port = neo_conf['http_port']
+    db = neo_conf['db_name']
+    graph = neo_conf['graph_name']
 
     auth_uri = '{}:{}'.format(host,port)
     authenticate(auth_uri, user, pw)
@@ -33,12 +35,4 @@ def upload_gene_interactions(conf):
 
 
 if __name__ == "__main__":
-    user = 'neo4j'
-    password = '1'
-    host = 'localhost'
-    http_port = 11018
-    db_name = 'PPI'
-    graph_name = 'interactors'
-    neo_conf = {'user':user,'pw':password,'host':host,'http_port':http_port,'db_name':db_name, 'graph_name':graph_name}
-    
-    upload_gene_interactions(neo_conf)
+    upload_gene_interactions(c.getNeo4JConfig())

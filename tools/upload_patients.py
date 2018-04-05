@@ -24,6 +24,8 @@ from cassandra.cqlengine import connection
 import csv
 import json
 
+from ..configs import DBConfig as c
+
 #database configs
 server_ip = 'localhost'
 port = 27017
@@ -35,8 +37,8 @@ port = 27017
     @param db_ip:string, the ip of the Cass database
     @param db_port:string, the port of the Cass database
 '''
-def upload_patient_information(db_ip, db_port='0000'):
-    connection.setup([server_ip], "cqlengine", protocol_version=3)
+def upload_patient_information(cass_conf):
+    connection.setup([cass_conf['host']], cass_conf['default_keyspace'], protocol_version=3)
     
     drop_table(Patient) #Drop table if it exist 
     sync_table(Patient) #In this case, it will create the table
@@ -56,4 +58,4 @@ def upload_patient_information(db_ip, db_port='0000'):
 
 
 if __name__ == "__main__":
-    upload_patient_information(server_ip)
+    upload_patient_information(c.getCassandraConfig())

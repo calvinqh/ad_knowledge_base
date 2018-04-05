@@ -19,6 +19,8 @@ import json
 import re
 import bson
 
+from ..configs import DBConfig as c
+
 #database configs
 server_ip = 'localhost'
 port = 27017
@@ -29,8 +31,8 @@ port = 27017
     @param db_ip:string, the ip of the mongodb
     @param db_port:int, the port of the mongodb
 '''
-def upload_gene_information(db_ip, db_port):
-    client = MongoClient(db_ip, db_port) #Client used to connect to cluster
+def upload_gene_information(mongo_conf):
+    client = MongoClient(mongo_conf['host'], mongo_conf['port']) #Client used to connect to cluster
 
     csv_file_name = 'ad_knowledge_base/data/entrez_ids_genesymbol.csv'
 
@@ -54,4 +56,4 @@ def upload_gene_information(db_ip, db_port):
 
 
 if __name__ == "__main__":
-    upload_gene_information(server_ip, port)
+    upload_gene_information(c.getMongoConfig())
