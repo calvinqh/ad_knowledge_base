@@ -20,9 +20,9 @@ class ADKnowledgeBase:
     '''
     def __init__(self, mongo_conf, cass_conf, neo_conf):
         #Create mongo client
-        self.mongo_client = MongoClient(mongo_conf['ip'],mongo_conf['port'])
+        self.mongo_client = MongoClient(mongo_conf['host'],mongo_conf['port'])
         #Setup default connection to cassandra cluster
-        connection.setup([cass_conf['ip']],cass_conf['default_keyspace'], protocol_version=3)
+        connection.setup([cass_conf['host']],cass_conf['default_keyspace'], protocol_version=3)
         #setup connection to neo4j database
         self.neo_client = None
         self.setup_neo(neo_conf)
