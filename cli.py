@@ -34,7 +34,7 @@ def main():
             find_more = True
             while find_more:
                 gene_num = kb.find_id(input_gene)
-                print(kb.getGeneReport(gene_num))
+                kb.display_gene_report(gene_num)
                 print()
                 print("Enter [0] to go BACK")
                 print("Enter [1] to enter a different GENE")
@@ -65,7 +65,7 @@ def main():
             input_patient_id = input("ENTER PATIENT ID: ")
             find_more = True
             while find_more:
-                print(kb.getPatientReport(input_patient_id))
+                kb.display_patient_report(input_patient_id)
                 print()
                 print("Enter [0] to go BACK")
                 print("Enter [1] to enter a different GENE")

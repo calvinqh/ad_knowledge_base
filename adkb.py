@@ -245,8 +245,27 @@ class ADKnowledgeBase:
         db = self.mongo_client.values
         uniprot_coll = db.uniprot
         uniprot_docs = uniprot_coll.find({'gene_symbol':gene})
-        
+        print("======================")
+        print("Results for", gene)
+        print("entrez_id:",uniprot_docs.next()['entrez_id'])
         for doc in uniprot_docs:
             print("Uniprot ID:", doc['uniprot_id'])
             print("Gene Name:", doc['Gene Name'])
-            print("Entrez ID:", doc['entrez_id'])
+        print("======================")
+
+    def display_gene_report(self,entrez):
+        data = self.getGeneReport(entrez)
+        print("======================")
+        print("Results for",entrez)
+        for key,value in data.items():
+            print('=======',value['_id'],'=======')
+            print('Average:',value['avg_entrez'])
+            print('Std:', value['std_entrez'])
+        print('========================')
+
+    def display_patient_report(self,p_id):
+        data = self.getPatientReport(p_id)
+        print("=======================")
+        for key,value in data.items():
+            print(key,":",value)
+        print('=======================')
