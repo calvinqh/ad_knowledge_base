@@ -1,5 +1,11 @@
-from adkb import ADKnowledgeBase
-from configs import DBConfig as c
+from adkb.adkb import ADKnowledgeBase
+from adkb.configs import DBConfig as c
+from adkb.tools.upload_interactors import upload_gene_interactions
+from adkb.tools.upload_gene import upload_gene_information 
+from adkb.tools.upload_patients import upload_patient_information 
+from adkb.tools.upload_rnaseq import upload_rosmaprna
+from adkb.tools.upload_uniprot import upload_uniprot_info
+from adkb.tools.merge_uniprot_gene import merge_uniprot_gene_information
 
 def main():
     kb = ADKnowledgeBase(c.getMongoConfig(), c.getCassandraConfig(), c.getNeo4JConfig())
@@ -15,8 +21,7 @@ def main():
 
             while find_more:
                 gene_num = kb.find_id(input_gene)
-                interacting_genes = kb.getNOrderGenes(gene_num)
-                print(interacting_genes)
+                kb.display_norder_genes(gene_num) 
                 print()
                 print("Enter [0] to go BACK")
                 print("Enter [1] to enter a different GENE")
@@ -68,7 +73,7 @@ def main():
                 kb.display_patient_report(input_patient_id)
                 print()
                 print("Enter [0] to go BACK")
-                print("Enter [1] to enter a different GENE")
+                print("Enter [1] to enter a different PATIENT ID")
                 again = int(input("ENTER [0/1]   "))
                 while again != 1 and again != 0:
                     again = int(input("Ener [0/1] "))
@@ -78,22 +83,34 @@ def main():
                     input_patient_id = input("ENTER PATIENT ID: ")
         elif press == 5:
             #insert PPI
-            pass
+            print("Uploading....")
+            upload_gene_interactions(c.getNeo4JConfig())
+            print("Complete..!")
         elif press == 6:
             #insert gene
-            pass
+            print("Uploading....")
+            upload_gene_information(c.getMongoConfig())
+            print("Complete..!")
         elif press == 7:
             #insert patients
-            pass
+            print("Uploading....")
+            upload_patient_information(c.getCassandraConfig())
+            print("Complete..!")
         elif press == 8:
             #insert RosmapRna_entrez
-            pass
+            print("Uploading....")
+            upload_rosmaprna(c.getMongoConfig())
+            print("Complete..!")
         elif press == 9:
             #insert uniprot
-            pass
+            print("Uploading....")
+            upload_uniprot_info(c.getMongoConfig())
+            print("Complete..!")
         elif press == 10:
             #merge uniprot and gene
-            pass
+            print("Merging....")
+            merge_uniprot_gene_information(c.getMongoConfig())
+            print("Complete..!")
         elif press == 0:
             exit = True
 

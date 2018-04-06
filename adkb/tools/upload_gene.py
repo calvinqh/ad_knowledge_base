@@ -45,7 +45,7 @@ port = 27017
 def upload_gene_information(mongo_conf):
     client = MongoClient(mongo_conf['host'], mongo_conf['port']) #Client used to connect to cluster
 
-    csv_file_name = 'ad_knowledge_base/data/entrez_ids_genesymbol.csv'
+    csv_file_name = 'adkb/data/entrez_ids_genesymbol.csv'
 
     csvFile = open(csv_file_name) #Load csvfile stream
     reader = csv.DictReader( csvFile ) #initalize csv reader with file stream

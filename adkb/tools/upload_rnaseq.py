@@ -39,7 +39,7 @@ from ..configs import DBConfig as c
 def upload_rosmaprna(mongo_conf):
     client = MongoClient(mongo_conf['host'], mongo_conf['port']) #Client used to connect to cluster
 
-    csv_file_name = 'ad_knowledge_base/data/ROSMAP_RNASeq_entrez.csv'
+    csv_file_name = 'adkb/data/ROSMAP_RNASeq_entrez.csv'
 
     csvFile = open(csv_file_name) #Load csvfile stream
     reader = csv.DictReader( csvFile ) #initalize csv reader with file stream

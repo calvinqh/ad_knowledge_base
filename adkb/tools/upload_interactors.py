@@ -53,7 +53,7 @@ def upload_gene_interactions(neo_conf):
    
     query = '''
         USING PERIODIC COMMIT
-        LOAD CSV FROM 'file:///home/calvin/Documents/bigdata/ad_knowledge_base/data/PPI.csv' AS row
+        LOAD CSV FROM 'file:///home/calvin/Documents/bigdata/ad_knowledge_base/adkb/data/PPI.csv' AS row
 
         MERGE (p1:interactor {name: row[0]})
         MERGE (p2:interactor {name: row[1]})

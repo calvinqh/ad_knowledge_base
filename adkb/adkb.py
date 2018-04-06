@@ -1,4 +1,4 @@
-from models.patient import Patient
+from .models.patient import Patient
 
 from cassandra.cqlengine import connection
 
@@ -190,7 +190,7 @@ class ADKnowledgeBase:
     '''
         Retrieves all genes that interact with the given gene
         @param entrez:string, the entrez id of a gene
-        @return list, a list containing all genes symbols that interact with the given gene
+        @return list, a list containing all entrez_ids that interact with the given gene
     '''
     def getNOrderGenes(self, entrez):
         interactors = []
@@ -209,10 +209,10 @@ class ADKnowledgeBase:
         #Search for genes that interact with given gene
         for n in self.graph.data(query1):
             e_id = n['s']['name']
-            interactors.append(self.find_name(e_id))
+            interactors.append(e_id)
         for n in self.graph.data(query2):
             e_id = n['e']['name']
-            interactors.append(self.find_name(e_id))
+            interactors.append(e_id)
         return interactors
 
     '''
@@ -246,7 +246,7 @@ class ADKnowledgeBase:
         uniprot_coll = db.uniprot
         uniprot_docs = uniprot_coll.find({'gene_symbol':gene})
         print("======================")
-        print("Results for", gene)
+        print("Gene Info Results for", gene)
         print("entrez_id:",uniprot_docs.next()['entrez_id'])
         for doc in uniprot_docs:
             print("Uniprot ID:", doc['uniprot_id'])
@@ -256,7 +256,7 @@ class ADKnowledgeBase:
     def display_gene_report(self,entrez):
         data = self.getGeneReport(entrez)
         print("======================")
-        print("Results for",entrez)
+        print("Gene Report for",entrez)
         for key,value in data.items():
             print('=======',value['_id'],'=======')
             print('Average:',value['avg_entrez'])
@@ -266,6 +266,15 @@ class ADKnowledgeBase:
     def display_patient_report(self,p_id):
         data = self.getPatientReport(p_id)
         print("=======================")
+        print("Patient Report for",p_id)
         for key,value in data.items():
             print(key,":",value)
         print('=======================')
+
+    def display_norder_genes(self,e_id):
+        data = self.getNOrderGenes(e_id)
+        print("======================")
+        print('N Order Results for',e_id)
+        for entrez_id in data:
+            print(entrez_id,":",self.find_name(entrez_id))
+        print("=====================")

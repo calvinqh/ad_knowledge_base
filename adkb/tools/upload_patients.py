@@ -49,7 +49,7 @@ def upload_patient_information(cass_conf):
     drop_table(Patient) #Drop table if it exist 
     sync_table(Patient) #In this case, it will create the table
 
-    csv_file_name = 'ad_knowledge_base/data/patients.csv'  #The file where the data is read from
+    csv_file_name = 'adkb/data/patients.csv'  #The file where the data is read from
 
     csvFile = open(csv_file_name) #Load csvfile stream
     reader = csv.DictReader( csvFile ) #initalize csv reader with file stream

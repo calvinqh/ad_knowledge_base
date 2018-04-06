@@ -44,7 +44,7 @@ from ..configs import DBConfig as c
 '''
 def upload_uniprot_info(mongo_conf):
 
-    txt_file_name = 'ad_knowledge_base/data/entrez_ids_uniprot.txt'
+    txt_file_name = 'adkb/data/entrez_ids_uniprot.txt'
     queryTemplate = '''
         mongoimport -h {} -p {} -d values -c uniprot --type tsv --file {} --headerline
     '''
