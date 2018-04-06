@@ -4,7 +4,7 @@ The goal of this project is to provide an interface for the user to interact wit
 **See below for screenshots**
 
 **Team Evaluation and Report for this project**
-[Link](docs/%27Project%201.pdf%27)
+[Link](docs/Project%201.pdf)
 
 The command line interface provides a set of general commands:
  - Retrieve the gene symbols that interacting with the given gene
