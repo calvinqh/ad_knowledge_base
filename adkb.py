@@ -194,15 +194,25 @@ class ADKnowledgeBase:
     '''
     def getNOrderGenes(self, entrez):
         interactors = []
-        #MATCH (s:interactor)-[r:INTERACTS_WITH]->(e:interactor) WHERE s.name = 'name' return e
-        #Search for genes that interact with the given entrez_id
-        for i in self.graph.match(rel_type = "INTERACTS_WITH"):
-            if i.start_node()['name'] == entrez:
-                #print(type(i.end_node()['name']))
-                interactors.append(self.find_name(i.end_node()["name"]))
-            elif i.end_node()['name'] == entrez:
-                #print(i.start_node()['name'])
-                interactors.append(self.find_name(i.start_node()['name']))
+        #Query templates to retrieve nodes that interact with given gene
+        #If the end node matches the gene return start node
+        q1_template = '''
+            MATCH(s:interactor)-[r:INTERACTS_WITH]->(e:interactor) WHERE e.name = '{}' RETURN s;
+        '''
+        #If the start node matches gene return end node
+        q2_template = '''
+            MATCH(s:interactor)-[r:INTERACTS_WITH]->(e:interactor) WHERE s.name = '{}' RETURN e;
+        '''
+        query1 = q1_template.format(entrez)
+        query2 = q2_template.format(entrez)
+
+        #Search for genes that interact with given gene
+        for n in self.graph.data(query1):
+            e_id = n['s']['name']
+            interactors.append(self.find_name(e_id))
+        for n in self.graph.data(query2):
+            e_id = n['e']['name']
+            interactors.append(self.find_name(e_id))
         return interactors
 
     '''
