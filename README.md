@@ -139,3 +139,18 @@ From ad_knowledge_base/ the following command will run a cli program to query th
 ## Data Flow/Structure
 ![](docs/dataflow.png)
 
+## Sample Usage
+Show case the use of querying n order interactions
+![](docs/1.jpg)
+
+Show case the use of querying the mean and std of gene expressions
+![](docs/2.jpg)
+
+Show case the use of querying for all other inforamtion about a gene
+![](docs/3a.jpg)
+
+![](docs/3b.jpg)
+
+Show case the use of querying patient information
+![](docs/4.jpg)
+
