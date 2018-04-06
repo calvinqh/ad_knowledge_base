@@ -21,4 +21,5 @@ if __name__ == '__main__':
     print(kb.find_name('987'))
     print()
     print(kb.find_name('23647'))
-
+    print()
+    print(kb.find_gene_info('RFWD2'))
