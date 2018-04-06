@@ -1,5 +1,4 @@
 import pandas as pd
-import cassandra
 import numpy as np
 
 from pymongo import Connection
@@ -7,25 +6,24 @@ from py2neo import Graph, Node, Relationship
 
 #puts all pairs of interactors which has a specific gene in it into a neo4j graph so that one interactor will have multiple relationships
 #then prints out all genes with a relationship with the specific gene
-def n_order_genes(gene_interactors, gene, all_genes):
-    #connect to local neo4j server with password set as '1'
-    graph = Graph(password = '1')
+def n_order_genes(graph, gene, all_genes):
+
     interact = graph.begin()
-    a = gene_interactors["interactor_A"]
-    b = gene_interactors["interactor_B"]
 
+    #a = gene_interactors["interactor_A"]
+    #b = gene_interactors["interactor_B"]
+    #
     #goes through the pandas document from beginning to end
-    for i in range(a.shape[0]):
-        interactor_a = str(a[i])
-        interactor_b = str(b[i])
-        #if the specific gene is found, make a relationship of the pair
-        if interactor_a == gene or interactor_b == gene:
-            first = Node("interactor", name = interactor_a)
-            second = Node("interactor", name = interactor_b)
-            graph.merge(Relationship(first, "INTERACTS WITH", second))
-
+    #for i in range(a.shape[0]):
+    #    interactor_a = str(a[i])
+    #    interactor_b = str(b[i])
+    #    #if the specific gene is found, make a relationship of the pair
+    #    if interactor_a == gene or interactor_b == gene:
+    #        first = Node("interactor", name = interactor_a)
+    #        second = Node("interactor", name = interactor_b)
+    #        graph.merge(Relationship(first, "INTERACTS WITH", second))
+    #
     #prints out all the related genes of the given gene
-    print ""
     print "INTERACTING GENES:"
     for i in graph.match(rel_type = "INTERACTS WITH"):
         if i.start_node()["name"] == str(gene):
@@ -71,13 +69,22 @@ def find_name(id, all_genes):
 
     return gene
 
-def print_pinfo(p_info, pid):
-    row = p_info.find({'id':pid})
-    for name in list(row):
-        print name["age"]
-        print name["gender"]
-        print name["education"]
-        print name["diagnosis"]
+#old and slow Neo4J insert
+def insert_interactors(graph, gene_interactors):
+    interact = graph.begin()
+    a = gene_interactors["interactor_A"]
+    b = gene_interactors["interactor_B"]
+
+    #goes through the pandas document from beginning to end
+    for i in range(a.shape[0]):
+        interactor_a = str(a[i])
+        interactor_b = str(b[i])
+        #if the specific gene is found, make a relationship of the pair
+        if interactor_a == gene or interactor_b == gene:
+            first = Node("interactor", name = interactor_a)
+            second = Node("interactor", name = interactor_b)
+            graph.merge(Relationship(first, "INTERACTS WITH", second))
+
     
 def merge_entrez_uniprot(entrez_and_genes, uniprot):
 
@@ -90,7 +97,7 @@ def merge_entrez_uniprot(entrez_and_genes, uniprot):
 
 def find_gene_info(gene, uniprot):
 
-    print 'Gene INFO:'
+    print 'GENE INFO:'
     name = uniprot.find({'gene_symbol':gene})
     entrez = ""
     for info in list(name):
@@ -108,13 +115,18 @@ def main():
     print("Enter [2] to find the mean and std of a GENEs expression values for AD/MCI/NCI")
     print("Enter [3] to find all other information associated with a GENE")
     print("Enter [4] to find all information of a given PATIENT")
-    print("Enter [5] to QUIT")
+    print("Enter [5] to insert data into Neo4J")
+    print("Enter [6] to update uniprot data in MongoDB")
+    print("Enter ANY other input to QUIT")
     print("")
 
     connect = Connection('localhost', 27017)
     db = connect.collection
     uniprot = db.uniprot
     all_genes = db.all_genes
+
+    #connect to local neo4j server with password set as '1'
+    graph = Graph(password = '1')
 
     press = int(input("ENTER A NUMBER FROM 1-4: "))
 
@@ -127,7 +139,7 @@ def main():
 
         while find_more == True:
             gene_num = find_id(gene, all_genes)
-            interacting_genes = n_order_genes(gene_interactors, gene_num, all_genes)
+            interacting_genes = n_order_genes(graph, gene_num, all_genes)
 
             print "Enter [0] to go BACK"
             print "Enter [1] to enter a different GENE"
@@ -144,8 +156,8 @@ def main():
         diseases = pd.read_csv("ROSMAP_RNASeq_disease_label.csv")
         patient_RNA = pd.read_csv("ROSMAP_RNASeq_entrez.csv")
     elif press == 3:
-        entrez_and_genes = pd.read_csv("entrez_ids_genesymbol.csv")
-        merge_entrez_uniprot(entrez_and_genes, uniprot)
+        #entrez_and_genes = pd.read_csv("entrez_ids_genesymbol.csv")
+        #merge_entrez_uniprot(entrez_and_genes, uniprot)
 
         gene = raw_input("ENTER A GENE: ")
         find_gene_info(gene, uniprot)
@@ -157,8 +169,13 @@ def main():
 
         pid = raw_input("ENTER A PATIENT ID: ")
 
-        #p_info = make_p_table(patients, patient_RNA, diseases)
-        #print_pinfo(p_info, pid)
+    elif press == 5:
+        gene_interactors = pd.read_csv("PPI.csv")
+        insert_interactors(graph, gene_interactors)
+
+    elif press == 6:
+        entrez_and_genes = pd.read_csv("entrez_ids_genesymbol.csv")
+        merge_entrez_uniprot(entrez_and_genes, uniprot)
 
 if __name__ == "__main__":
     main()
