@@ -2,34 +2,39 @@
     A script that will upload ROSMAP_RNASeq_entrez.csv onto a mongo cluster.
     The script contains the function to upload the csv onto specific cluster
     This function, with modification, can be generalized for any csv file.
+    The database is values
+    The collection is called rna
 
     Contains:
-    upload_rosmaprna(db_ip:string, db_port:int)
+    upload_rosmaprna(mongo_conf:dict)
 
-    Instructions: 
-    User must set the server ip and port for the mongo cluster.
-    The user must also specify csv file they wish to upload.
-    The data will be uploaded in json format. 
-    Each field in the csv will act as a key.
-    Each row will become a document.
+    Preqs/Instructions: 
+    The user has setup the mongo configurations in the configs file
+    Assumes:
+        The csv file is located in the data folder
+        The user is running this program from the parent directory
+            of this project
+        Mongo cluster and database is running and setup
+        Mongo configs are correct, else will crash
+        The database is called values
 '''
 from pymongo import MongoClient
 import csv
-import json
 import re
-import bson
+import json
 
 from ..configs import DBConfig as c
 
-#database configs
-server_ip = 'localhost'
-port = 27017
-
 '''
-    The purpose of this function is to upload ROSMAP_RNASeq_entrez csv to Mongodb
-    The data is stored in the values db, in the rna collection
-    @param db_ip:string, the ip of the mongodb
-    @param db_port:int, the port of the mongodb
+    Upload ROSMAP_RNASeq_entrez csv to Mongodb
+    The data is stored in the values database, in the rna collection
+    Assumes:
+        The user is runnign this function from the parent directory
+            of this project
+        The csv file is located in the data folder
+        The mongo configs are correct, else will crash
+        The mongo server is up and running
+    @param mongo_conf:dict, configs for the mongodb (ip and port) check configs
 '''
 def upload_rosmaprna(mongo_conf):
     client = MongoClient(mongo_conf['host'], mongo_conf['port']) #Client used to connect to cluster

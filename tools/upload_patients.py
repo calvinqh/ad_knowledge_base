@@ -4,17 +4,18 @@
     This function, with modification, can be generalized for any csv file.
 
     Contains:
-    upload_patient_information(db_ip:string, db_port:int=0000)
+    upload_patient_information(cass_conf:dict)
 
     Instructions: 
-    User must set the server ip, port and keyspace for the cassandra cluster and keyspace.
-    The user must also specify csv file they wish to upload.
-    Each field in the csv will act as a column.
-    Each row will become a record.
-    
-    To Create a keyspace, use cqlsh:
-    CREATE KEYSPACE IF NOT EXISTS mylittlekeyspace WITH REPLICATION = 
-    {'class': 'SimpleStrategy', 'replication_factor' : 1};
+    The user must set the cassandra configurations in the configs file
+    Assumes:
+        The csv file is in the data folder.
+        The cassandra configs are correct, will crash otherwise
+        The keyspace and database are up and running
+            Other wise check readme for instructions on cassandra db
+            and keyspace setup
+        The user is running this program from the parent directory
+            of this project
 '''
 from ..models.patient import Patient 
 
@@ -31,11 +32,16 @@ server_ip = 'localhost'
 port = 27017
 
 '''
-    The purpose of this function is to upload patients csv to Cassandra keyspace
-    The keyspace is specified in the Patient model. (To change update patient model)
-    In this case, the keyspace is 'mylittlekeyspace'
-    @param db_ip:string, the ip of the Cass database
-    @param db_port:string, the port of the Cass database
+    Uploads patients csv to Cassandra keyspace
+    The keyspace is specified in the Patient model. (To change update patient model
+        and update keyspace using cqlsh)
+    In this case, the keyspace is 'patient_info'
+    Assumes:
+        Neo configs are correct, otherwise will crash
+        User calls this function from parent directory of this project
+        Csv file located in data folder
+        Cassandra database is running.
+    @param cass_conf:dict, config of cassandra database. check configs file. 
 '''
 def upload_patient_information(cass_conf):
     connection.setup([cass_conf['host']], cass_conf['default_keyspace'], protocol_version=3)

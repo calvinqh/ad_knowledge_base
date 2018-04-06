@@ -1,31 +1,24 @@
 '''
-    A script that will upload entrez_ids_genesymbol.csv onto a mongo cluster.
-    The script contains the function to upload the csv onto specific cluster
-    This function, with modification, can be generalized for any csv file.
+    A script that will merge gene collection gene symbol name into
+    uniprot collection that is all on a mongo cluster in the values database.
+    The script contains the function "merge" these two collection 
 
     Contains:
-    upload_gene_information(db_ip:string, db_port:int)
+    merge_gene_uniprot_information(mongo_conf:dict)
 
-    Instructions: 
-    User must set the server ip and port for the mongo cluster.
-    The user must also specify csv file they wish to upload.
-    The data will be uploaded in json format. 
-    Each field in the csv will act as a key.
-    Each row will become a document.
+    Preqs/Instructions: 
+    The user must set the mongo configurations in the configs file
+    This program assumes that gene and uniprot collection in the values database
+        are filled with the correct documents (user ran upload_gene and upload_uniprot
 '''
 from pymongo import MongoClient
-import csv
-import json
-import re
-import bson
 
 from ..configs import DBConfig as c
 
 '''
-    The purpose of this function is to upload entrez_ids_genesymbol csv file to a Mongodb.
-    The data is stored in the values db, in the gene collection
-    @param db_ip:string, the ip of the mongodb
-    @param db_port:int, the port of the mongodb
+    This function adds gene_symbol field into all docs in uniprot collection
+    It utilizes the gene collection to get the gene symbols for each uniprot doc
+    @param mongo_conf:dict, the configuration of the mongo db (host and port)
 '''
 def merge_gene_uniprot_information(mongo_conf):
     client = MongoClient(mongo_conf['host'], mongo_conf['port']) #Client used to connect to cluster
