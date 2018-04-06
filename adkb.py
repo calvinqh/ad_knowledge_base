@@ -24,9 +24,13 @@ class ADKnowledgeBase:
         #Setup default connection to cassandra cluster
         connection.setup([cass_conf['host']],cass_conf['default_keyspace'], protocol_version=3)
         #setup connection to neo4j database
-        self.neo_client = None
+        self.graph = None #Neo client graph
         self.setup_neo(neo_conf)
 
+    '''
+        Setup the graph attribute to access neo4j database graph for PPI
+        @param conf:dict, dict containing configs for neo4j graph database
+    '''
     def setup_neo(self, conf):
         http.socket_timeout = 10000000
        
@@ -184,27 +188,26 @@ class ADKnowledgeBase:
 
 
     '''
-        Uploads and retrieves all genes that interact with the given gene
-        @param gene:string, the entrez id of a gene
-        @param all_genes:collection, a mongo collection containing information about genes
-        @return list, a list containing all genes that interact with the given gene
+        Retrieves all genes that interact with the given gene
+        @param entrez:string, the entrez id of a gene
+        @return list, a list containing all genes symbols that interact with the given gene
     '''
-    def getNOrderGenes(self, gene):
+    def getNOrderGenes(self, entrez):
         interactors = []
         #MATCH (s:interactor)-[r:INTERACTS_WITH]->(e:interactor) WHERE s.name = 'name' return e
         #Search for genes that interact with the given entrez_id
         for i in self.graph.match(rel_type = "INTERACTS_WITH"):
-            if i.start_node()['name'] == gene:
+            if i.start_node()['name'] == entrez:
                 #print(type(i.end_node()['name']))
                 interactors.append(self.find_name(i.end_node()["name"]))
-            elif i.end_node()['name'] == gene:
+            elif i.end_node()['name'] == entrez:
                 #print(i.start_node()['name'])
                 interactors.append(self.find_name(i.start_node()['name']))
         return interactors
 
     '''
         Searches for entrez id given gene symbol 
-        @param id:int, the entrez id of a gene
+        @param gene_symbol:int, the entrez id of a gene
         @return string, gene name for corresponding entrez id
     '''
     def find_id(self,gene_symbol):
@@ -215,7 +218,7 @@ class ADKnowledgeBase:
 
     '''
         Searches for gene name given entrez id of gene
-        @param entrez_id:int, the entrez id
+        @param entrez_id:string, the entrez id
         @return string, gene symbol for corresponding entrez id
     '''
     def find_name(self,entrez_id):
@@ -224,6 +227,10 @@ class ADKnowledgeBase:
             return doc['gene_symbol']
         return None
 
+    '''
+        Displays gene information for the provided gene symbol
+        @param gene_symbol:string, gene symbol of the gene we want to find info for
+    '''
     def display_gene_info(self,gene):
         db = self.mongo_client.values
         uniprot_coll = db.uniprot
