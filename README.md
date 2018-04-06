@@ -42,25 +42,25 @@ pip install -r requirements.txt
 ## Quickstart
 
  1. Follow setup instruction (steps 1-5)
- 2. To upload, from the parent directory of this project
+ 2. To upload, from the root directory of this project
  ```
  #Uploads patients.csv
-python -m ad_knowledge_base.tools.upload_patients 
+python -m adkb.tools.upload_patients 
 
 #Uploads interactors (should take ~2 mins depending on your machine
-python -m ad_knowledge_base.tools.upload_interactors 
+python -m adkb.tools.upload_interactors 
 
 #Upload ROSMAP_RNASeq_entrez.csv, may take some time depending on your machine
-python -m ad_knowledge_base.tools.upload_rnaseq 
+python -m adkb.tools.upload_rnaseq 
 
 #Upload entrez_id_genesymbol.csv
-python -m ad_knowledge_base.tools.upload_gene
+python -m adkb.tools.upload_gene
 
 #Upload entrez_ids_uniprot.txt 
-python -m ad_knowledge_base.tools.upload_uniprot
+python -m adkb.tools.upload_uniprot
 
 #Merge gene symb attribute into uniprot collection, will take ~10mins
-python -m ad_knowledge_base.tools.merge_uniprot_gene  
+python -m adkb.tools.merge_uniprot_gene  
 ```
 3. Launch the CLI in the project directory
 ```python -m cli```
@@ -88,15 +88,15 @@ ad_knowledge_base/
 
 ## To upload data onto the databases
 ### Using python scripts
-From the parent directory of ad_knowledge_base/ the following commands will upload data their databases
-```python -m ad_knowledge_base.tools.upload_*```
+From the root directory, ad_knowledge_base/, the following commands will upload data their databases
+```python -m adkb.tools.upload_*```
 Note: do not include the py extension when running the upload command.
 ### Using native NoSQL commands
 #### Mongo ```(entrez_ids_uniprot.txt, ROSMAP_RNASeq_entrez.csv, uniprot-human.xml)```
 
 From the command line:
 ```
-./mongoimport -d collection -c uniprot --type tsv --file entrez_ids_uniprot.txt --headerline
+./mongoimport -d collection -c uniprot --type tsv --file <file/to/entrez_ids_uniprot.txt> --headerline
 ```
 #### Cassandra```(patients.csv)```
 Run ```./cqlsh``` and in the shell:
@@ -124,7 +124,7 @@ If you did not disable this feature, you will have to put the csv file into the 
 To upload **PPI.csv**,assuming you have turned off the feature
 ```
 	USING PERIODIC COMMIT
-	LOAD CSV FROM 'file:///<path/to/csv>/PPI.csv' AS row#alternatively file:///PPI.csv
+	LOAD CSV FROM 'file:///<abspath/to/csv>/PPI.csv' AS row#alternatively file:///PPI.csv
 
 	MERGE(p1:interactor {name: row[0]})
 	MERGE(p2:interactor {name: row[1]})
