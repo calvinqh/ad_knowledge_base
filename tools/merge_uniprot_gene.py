@@ -4,7 +4,7 @@
     The script contains the function "merge" these two collection 
 
     Contains:
-    merge_gene_uniprot_information(mongo_conf:dict)
+    merge_uniprot_gene_information(mongo_conf:dict)
 
     Preqs/Instructions: 
     The user must set the mongo configurations in the configs file
@@ -20,7 +20,7 @@ from ..configs import DBConfig as c
     It utilizes the gene collection to get the gene symbols for each uniprot doc
     @param mongo_conf:dict, the configuration of the mongo db (host and port)
 '''
-def merge_gene_uniprot_information(mongo_conf):
+def merge_uniprot_gene_information(mongo_conf):
     client = MongoClient(mongo_conf['host'], mongo_conf['port']) #Client used to connect to cluster
     db = client.values
     uniprot_collection = db.uniprot
