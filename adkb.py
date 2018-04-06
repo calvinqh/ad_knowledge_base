@@ -222,3 +222,13 @@ class ADKnowledgeBase:
         if doc is not None:
             return doc['gene_symbol']
         return None
+
+    def find_gene_info(self,gene):
+        db = self.mongo_client.values
+        uniprot_coll = db.uniprot
+        uniprot_docs = uniprot_coll.find({'gene_symbol':gene})
+        
+        for doc in uniprot_docs:
+            print("Uniprot ID:", doc['uniprot_id'])
+            print("Gene Name:", doc['Gene Name'])
+            print("Entrez ID:", doc['entrez_id'])
