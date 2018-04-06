@@ -2,16 +2,21 @@
     A script that will upload entrez_ids_genesymbol.csv onto a mongo cluster.
     The script contains the function to upload the csv onto specific cluster
     This function, with modification, can be generalized for any csv file.
+    The database is value
+    The collection is called gene
 
     Contains:
-    upload_gene_information(db_ip:string, db_port:int)
+    upload_gene_information(mongo_conf:dict)
 
-    Instructions: 
-    User must set the server ip and port for the mongo cluster.
-    The user must also specify csv file they wish to upload.
-    The data will be uploaded in json format. 
-    Each field in the csv will act as a key.
-    Each row will become a document.
+    Instructions:
+    The user has setup the mongo configurations in the configs file
+    Assumes:
+        The csv file is located in the the data folder
+        The user is running the program from the parent directory
+            of this project
+        Mongo cluster and database is running and setup
+        Mongo configs are correct, else wil crash
+        Thet database is called gene
 '''
 from pymongo import MongoClient
 import csv
@@ -26,10 +31,16 @@ server_ip = 'localhost'
 port = 27017
 
 '''
-    The purpose of this function is to upload entrez_ids_genesymbol csv file to a Mongodb.
+    Upload entrez_ids_genesymbol csv file to a Mongodb.
     The data is stored in the values db, in the gene collection
-    @param db_ip:string, the ip of the mongodb
-    @param db_port:int, the port of the mongodb
+     Assumes:
+        The csv file is located in the the data folder
+        The user is running this function from the parent directory
+            of this project
+        Mongo cluster and database is running and setup
+        Mongo configs are correct, else wil crash
+        The database is called gene
+    @param mongo_conf:dict, the configs for the mongodb(ip,port) check configs
 '''
 def upload_gene_information(mongo_conf):
     client = MongoClient(mongo_conf['host'], mongo_conf['port']) #Client used to connect to cluster
