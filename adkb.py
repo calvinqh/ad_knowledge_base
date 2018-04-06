@@ -191,14 +191,15 @@ class ADKnowledgeBase:
     '''
     def getNOrderGenes(self, gene):
         interactors = []
+        #MATCH (s:interactor)-[r:INTERACTS_WITH]->(e:interactor) WHERE s.name = 'name' return e
         #Search for genes that interact with the given entrez_id
         for i in self.graph.match(rel_type = "INTERACTS_WITH"):
             if i.start_node()['name'] == gene:
-                print(i.start_node['name'])
-                interactors.append(find_name(i.end_node()["name"]))
+                #print(type(i.end_node()['name']))
+                interactors.append(self.find_name(i.end_node()["name"]))
             elif i.end_node()['name'] == gene:
-                print(i.end_node['name'])
-                interactors.append(find_name(i.start_node()['name']))
+                #print(i.start_node()['name'])
+                interactors.append(self.find_name(i.start_node()['name']))
         return interactors
 
     '''
@@ -206,7 +207,7 @@ class ADKnowledgeBase:
         @param id:int, the entrez id of a gene
         @return string, gene name for corresponding entrez id
     '''
-    def find_id(self,gene):
+    def find_id(self,gene_symbol):
         doc = self.getGeneDetailsBySymbol(gene_symbol)
         if doc is not None:
             return doc['entrez_id']
@@ -223,7 +224,7 @@ class ADKnowledgeBase:
             return doc['gene_symbol']
         return None
 
-    def find_gene_info(self,gene):
+    def display_gene_info(self,gene):
         db = self.mongo_client.values
         uniprot_coll = db.uniprot
         uniprot_docs = uniprot_coll.find({'gene_symbol':gene})
