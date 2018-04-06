@@ -25,11 +25,24 @@ def n_order_genes(graph, gene, all_genes):
     #
     #prints out all the related genes of the given gene
     print "INTERACTING GENES:"
+    #Loop through every edge/relationship with the tag INTERACTS WITH
     for i in graph.match(rel_type = "INTERACTS WITH"):
-        if i.start_node()["name"] == str(gene):
-            print find_name(i.end_node()["name"], all_genes)
-        elif i.end_node()["name"] == str(gene):
+        if i.start_node()["name"] == gene: #If node1 matches gene
+            print find_name(i.end_node()["name"], all_genes) 
+        elif i.end_node()["name"] == gene: #If node 2 matches gene
             print find_name(i.start_node()["name"], all_genes)
+
+def make_gene_table(entrez_and_genes):
+
+    connect = Connection('localhost', 27017)
+    db = connect.collection
+    all_genes = db.all_genes #reference to collection to gene information
+    ids = entrez_and_genes["entrez_id"] #reference entrez id series
+    genes = entrez_and_genes["gene_symbol"] #reference gene series
+    print "Inserting data into MongoDB..."
+    #Insert into databse, if duplicates exists update duplicate
+    for i in range(ids.shape[0]):
+        all_genes.update({'entrez':str(ids[i]), 'gene':genes[i]}, {'entrez':str(ids[i]), 'gene':genes[i]}, upsert = True)
 
 
 #puts the gene name and entrez id of the gene into a mongodb collection

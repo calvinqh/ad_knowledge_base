@@ -1,0 +1,8 @@
+cassandra-driver==3.13.0
+numpy==1.14.2
+pandas==0.22.0
+py2neo==3.1.2
+pymongo==3.6.1
+python-dateutil==2.7.2
+pytz==2018.3
+six==1.11.0

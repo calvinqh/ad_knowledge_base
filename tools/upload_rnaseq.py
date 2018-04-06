@@ -1,32 +1,45 @@
 '''
     A script that will upload ROSMAP_RNASeq_entrez.csv onto a mongo cluster.
-    This script can be generalized for any csv file.
+    The script contains the function to upload the csv onto specific cluster
+    This function, with modification, can be generalized for any csv file.
+    The database is values
+    The collection is called rna
 
-    Instructions: 
-    User must set the server ip and port for the mongo cluster.
-    The user must also specify csv file they wish to upload.
-    The data will be uploaded in json format. 
-    Each field in the csv will act as a key.
-    Each row will become a document.
+    Contains:
+    upload_rosmaprna(mongo_conf:dict)
+
+    Preqs/Instructions: 
+    The user has setup the mongo configurations in the configs file
+    Assumes:
+        The csv file is located in the data folder
+        The user is running this program from the parent directory
+            of this project
+        Mongo cluster and database is running and setup
+        Mongo configs are correct, else will crash
+        The database is called values
 '''
 from pymongo import MongoClient
 import csv
-import json
 import re
-import bson
+import json
 
-#database configs
-server_ip = 'localhost'
-port = 27017
+from ..configs import DBConfig as c
 
-#csv file configs
-csv_file_name = 'ad_knowledge_base/data/ROSMAP_RNASeq_entrez.csv'
-header = ["PATIENT_ID", "DIAGNOSIS"] #This is temporary (the values will be initalized later)
+'''
+    Upload ROSMAP_RNASeq_entrez csv to Mongodb
+    The data is stored in the values database, in the rna collection
+    Assumes:
+        The user is runnign this function from the parent directory
+            of this project
+        The csv file is located in the data folder
+        The mongo configs are correct, else will crash
+        The mongo server is up and running
+    @param mongo_conf:dict, configs for the mongodb (ip and port) check configs
+'''
+def upload_rosmaprna(mongo_conf):
+    client = MongoClient(mongo_conf['host'], mongo_conf['port']) #Client used to connect to cluster
 
-
-if __name__ == "__main__":
-
-    client = MongoClient(server_ip, port) #Client used to connect to cluster
+    csv_file_name = 'ad_knowledge_base/data/ROSMAP_RNASeq_entrez.csv'
 
     csvFile = open(csv_file_name) #Load csvfile stream
     reader = csv.DictReader( csvFile ) #initalize csv reader with file stream
@@ -36,8 +49,6 @@ if __name__ == "__main__":
     collection = db.rna #retrieve the collection RNA from Values database
     collection.drop() #empty the collection (drop all documents)
     
-    counter = 1
-
     #For each row in the csv, convert it into json format and insert into the collection
     for row in reader:
         instance = {}
@@ -47,10 +58,10 @@ if __name__ == "__main__":
                 instance[field] = float(row[field])
             else:
                 instance[field] = row[field]
-        if(counter > 0):
-            print(instance)
-            counter-=1
 
         #upload onto collection
         collection.insert(instance)
 
+
+if __name__ == "__main__":
+    upload_rosmaprna(c.getMongoConfig())
