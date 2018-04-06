@@ -2,7 +2,10 @@
 The goal of this project is to provide an interface for the user to interact with Alzheimer Disease Knowledge Database. This interface simplifies the process of retrieving information from this knowledge base. Rather than parsing csv, xml and txt files, using this interface speeds up retrievals and provides a set of function to query the knowledge databases.
 
 **See below for screenshots**
-**Team Evaluation and Report for this project**[Link](docs/%27Project%201.pdf%27)
+
+**Team Evaluation and Report for this project**
+[Link](docs/%27Project%201.pdf%27)
+
 The command line interface provides a set of general commands:
  - Retrieve the gene symbols that interacting with the given gene
  - Retrieve the mean and std 
