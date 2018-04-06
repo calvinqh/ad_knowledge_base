@@ -1,7 +1,18 @@
-
-
 # About the project
-This project contains the tools needed to upload the provided data files (csv, xml, and txt) onto multiple databases to create a Alzheimer Disease Knowledgebase. This project also contains an interface to interact with these databases. The interface provides methods to query the database for information. Patient information is stored onto a cassandra keyspace. RosmapRNA information is stored onto a mongo instance. Gene interaction information is stored onto a Neo4J database. The tools to upload data onto these databases are located in ```tools/```.  Instructions on how to upload the data with/without python scripts are mentioned below.
+The goal of this project is to provide an interface for the user to interact with Alzheimer Disease Knowledge Database. This interface simplifies the process of retrieving information from this knowledge base. Rather than parsing csv, xml and txt files, using this interface speeds up retrievals and provides a set of function to query the knowledge databases.
+
+The command line interface provides a set of general commands:
+ - Retrieve the gene symbols that interacting with the given gene
+ - Retrieve the mean and std 
+ - Retrieval of gene information (entrez id, gene symbol, corresponding uniprot ids, ...)
+ - Retrieve patient information
+ - Upload csv, xml, and txt files (data files)
+
+Patient information is stored onto a Cassandra keyspace. 
+Gene interaction information is stored onto a Neo4J database. 
+RosmapRNASeq, Gene and Uniprot information is stored onto a Mongo instance. 
+
+The tools to upload data onto these databases are located in ```tools/```.  Instructions on how to upload the data with/without python scripts are mentioned below.
 
 The command line interface is ```cli.py```
 
@@ -25,15 +36,41 @@ pip install -r requirements.txt
 4. Setup the database configs for Mongo,Cassandra, and Neo4J. In the ```configs.py``` file. Edit the config functions to match your database configs.
 5. In the ```data/``` folder at the root of this project, put all csv, xml, and txt files that are required for this project.
 6. To perform uploads rerfer to upload instructions below.
-7. To start the command line interface:
-```pythom -m ad_knowledge_base.cli```
+7. To start the command line interface launch the cli file in the project directory:
+```pythom -m cli```
 
+## Quickstart
+
+ 1. Follow setup instruction (steps 1-5)
+ 2. To upload, from the parent directory of this project
+ ```
+ #Uploads patients.csv
+python -m ad_knowledge_base.tools.upload_patients 
+
+#Uploads interactors (should take ~2 mins depending on your machine
+python -m ad_knowledge_base.tools.upload_interactors 
+
+#Upload ROSMAP_RNASeq_entrez.csv, may take some time depending on your machine
+python -m ad_knowledge_base.tools.upload_rnaseq 
+
+#Upload entrez_id_genesymbol.csv
+python -m ad_knowledge_base.tools.upload_gene
+
+#Upload entrez_ids_uniprot.txt 
+python -m ad_knowledge_base.tools.upload_uniprot
+
+#Merge gene symb attribute into uniprot collection, will take ~10mins
+python -m ad_knowledge_base.tools.merge_uniprot_gene  
+```
+3. Launch the CLI in the project directory
+```python -m cli```
 
 ## Project Structure
 ```
 ad_knowledge_base/
 	__init__.py
 	adkb.py 					#The interface module
+	cli.py						#The command line interface
 	configs.py					#Database configs
 	models/						#Model used by Cassandra database
 		__init__.py
@@ -44,6 +81,8 @@ ad_knowledge_base/
 		upload_rnaseq.py		#Upload script for ROSMAP_RNASeq_entrez.csv
 		upload_gene.py			#Upload script for entrez_ids_genesymbol.csv
 		upload_interactors.py	#Upload script for PPI.csv
+		upload_uniprot.py		#Upload script for entrez_id_uniprot.txt
+		merge_uniprot_gene.py	#Script to add gene_symbol attribute into uniprot documents
 	data/ 						#Add all csv,xml,and txt files here
 ```
 
@@ -94,16 +133,9 @@ To upload **PPI.csv**,assuming you have turned off the feature
 
 
 ## To run the command line interface
-From parent directory of ad_knowledge_base/ the following command will run a cli program to query the databases.
-```python -m ad_knowledge_base.cli```
+From ad_knowledge_base/ the following command will run a cli program to query the databases.
+```python -m cli```
 
-## CLI commands
-```
-patient <name:string>
-```
-Retrieves all patient infromation.
-
-
-## Data structure
+## Data Flow/Structure
 ![](docs/dataflow.png)
 
