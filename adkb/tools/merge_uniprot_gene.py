@@ -28,9 +28,9 @@ def merge_uniprot_gene_information(mongo_conf):
     gene_collection = db.gene
     genes = gene_collection.find()
     for doc in genes:
-        uniprot_collection.update({'entrez_id':int(doc['entrez_id'])}, {'$set': {'gene_symbol':doc['gene_symbol']}}, multi=True, upsert=False)
+        uniprot_collection.update_many({'entrez_id':int(doc['entrez_id'])}, {'$set': {'gene_symbol':doc['gene_symbol']}}, upsert=False)
         #print(type(doc['entrez_id']))
 
 
 if __name__ == "__main__":
-    merge_gene_uniprot_information(c.getMongoConfig())
+    merge_uniprot_gene_information(c.getMongoConfig())
