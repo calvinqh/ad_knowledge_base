@@ -40,8 +40,10 @@ pip install -r requirements.txt
 
 4. Setup the database configs for Mongo,Cassandra, and Neo4J. In the ```configs.py``` file. Edit the config functions to match your database configs.
 5. In the ```data/``` folder at the root of this project, put all csv, xml, and txt files that are required for this project.
-6. To perform uploads rerfer to upload instructions below.
-7. To start the command line interface launch the cli file in the project directory:
+6. In the tools folder, for each upload/merge script, make sure that the path is correct.
+**Note** The file path for the csv in upload_interactors must be the absolute path to the file!
+7. To perform uploads rerfer to upload instructions below.
+8. To start the command line interface launch the cli file in the project directory:
 ```pythom -m cli```
 
 ## Quickstart
