@@ -190,7 +190,9 @@ class ADKnowledgeBase:
     '''
         Retrieves all genes that interact with the given gene
         @param entrez:string, the entrez id of a gene
-        @return list, a list containing all entrez_ids that interact with the given gene
+        @param order:int, the max relationship length / order to get genes of
+        @return dict, a dict containing all entrez_ids that interact with the given gene.
+                        Maps order/level to list of entrez ids.
     '''
     def getNOrderGenes(self, entrez, order):
         interactor_orders = {} 
@@ -255,6 +257,10 @@ class ADKnowledgeBase:
             print("Gene Name:", doc['Gene Name'])
         print("======================")
 
+    '''
+        Displays the mean and std expression values for NCI/MCI/AD for the provided entrez_id
+        @param entrez:int, entrez_id for a gene
+    '''
     def display_gene_report(self,entrez):
         data = self.getGeneReport(entrez)
         print("======================")
@@ -265,6 +271,10 @@ class ADKnowledgeBase:
             print('Std:', value['std_entrez'])
         print('========================')
 
+    '''
+        Displays patient information for the given patient id
+        @param p_id:string, patient id
+    '''
     def display_patient_report(self,p_id):
         data = self.getPatientReport(p_id)
         print("=======================")
@@ -273,6 +283,11 @@ class ADKnowledgeBase:
             print(key,":",value)
         print('=======================')
 
+    '''
+        Displays n order interacting genes for the given entrez id and max order
+        @param e_id, entrez id of a gene
+        @param order, the max relationship length/order
+    '''
     def display_norder_genes(self,e_id, order):
         interactor_orders = self.getNOrderGenes(e_id, order)
         print("======================")
