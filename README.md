@@ -1,5 +1,6 @@
+
 # About the project
-The goal of this project is to provide an interface for the user to interact with Alzheimer Disease Knowledge Database. This interface simplifies the process of retrieving information from this knowledge base. Rather than parsing csv, xml and txt files, using this interface speeds up retrievals and provides a set of function to query the knowledge databases.
+The goal of this project is to provide an interface for the user to interact with Alzheimer Disease Knowledge Database. This interface simplifies the process of retrieving information from this knowledge base. Rather than parsing csv and txt files, using this interface speeds up retrievals and provides a set of function to query the knowledge databases.
 
 **See below for screenshots**
 
@@ -7,11 +8,11 @@ The goal of this project is to provide an interface for the user to interact wit
 [Link](docs/Project%201.pdf)
 
 The command line interface provides a set of general commands:
- - Retrieve the gene symbols that interacting with the given gene
- - Retrieve the mean and std 
+ - Retrieve the gene symbols that interacting with the given gene and order
+ - Retrieve the mean and std for given gene
  - Retrieval of gene information (entrez id, gene symbol, corresponding uniprot ids, ...)
  - Retrieve patient information
- - Upload csv, xml, and txt files (data files)
+ - Upload csv and txt files (data files)
 
 Patient information is stored onto a Cassandra keyspace. 
 Gene interaction information is stored onto a Neo4J database. 
