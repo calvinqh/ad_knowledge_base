@@ -7,6 +7,9 @@ The goal of this project is to provide an interface for the user to interact wit
 **Team Evaluation and Report for this project**
 [Link](docs/Project%201.pdf)
 
+**API documentation**
+[Link](docs/api.md)
+
 The command line interface provides a set of general commands:
  - Retrieve the gene symbols that interacting with the given gene and order
  - Retrieve the mean and std for given gene
