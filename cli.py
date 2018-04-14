@@ -21,7 +21,7 @@ def main():
 
             while find_more:
                 gene_num = kb.find_id(input_gene)
-                kb.display_norder_genes(gene_num) 
+                kb.display_norder_genes(gene_num,1) 
                 print()
                 print("Enter [0] to go BACK")
                 print("Enter [1] to enter a different GENE")

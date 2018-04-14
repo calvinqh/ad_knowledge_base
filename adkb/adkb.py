@@ -192,8 +192,8 @@ class ADKnowledgeBase:
         @param entrez:string, the entrez id of a gene
         @return list, a list containing all entrez_ids that interact with the given gene
     '''
-    def getNOrderGenes(self, entrez):
-        interactors = []
+    def getNOrderGenes(self, entrez, order):
+        interactor_orders = {} 
         #Query templates to retrieve nodes that interact with given gene
         #If the end node matches the gene return start node
         q1_template = '''
@@ -205,15 +205,17 @@ class ADKnowledgeBase:
         '''
         query1 = q1_template.format(entrez)
         query2 = q2_template.format(entrez)
-
-        #Search for genes that interact with given gene
-        for n in self.graph.data(query1):
-            e_id = n['s']['name']
-            interactors.append(e_id)
-        for n in self.graph.data(query2):
-            e_id = n['e']['name']
-            interactors.append(e_id)
-        return interactors
+        for count in range(1,order+1):
+            #Search for genes that interact with given gene
+            interactors = []
+            for n in self.graph.data(query1):
+                e_id = n['s']['name']
+                interactors.append(e_id)
+            for n in self.graph.data(query2):
+                e_id = n['e']['name']
+                interactors.append(e_id)
+            interactor_orders[count] = interactors
+        return interactor_orders
 
     '''
         Searches for entrez id given gene symbol 
@@ -271,10 +273,12 @@ class ADKnowledgeBase:
             print(key,":",value)
         print('=======================')
 
-    def display_norder_genes(self,e_id):
-        data = self.getNOrderGenes(e_id)
+    def display_norder_genes(self,e_id, order):
+        interactor_orders = self.getNOrderGenes(e_id, order)
         print("======================")
         print('N Order Results for',e_id)
-        for entrez_id in data:
-            print(entrez_id,":",self.find_name(entrez_id))
+        for order,interactors in interactor_orders.items():
+            print(order)
+            for entrez_id in interactors:
+                print(entrez_id,":",self.find_name(entrez_id))
         print("=====================")
