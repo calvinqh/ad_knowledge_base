@@ -11,7 +11,7 @@ From ADKnowledgeBase instance:
 ```
 getNOrderGenes(entrez_id, order)
 ```
-Returns a list of entrez_ids connected to the given entrez id
+Returns a dict of entrez_ids connected to the given entrez id. Maps orders to list of entrez ids
 ```
 getGeneReport(entrez_id)
 ```
@@ -27,7 +27,7 @@ Returns patient information in a dictionary (id, age, gender, education, diagnos
 ```
 display_norder_genes(entrez_id,order)
 ```
-Display the entrez ids of the genes that connect to the provided entrez id
+Display the entrez ids of the genes and their order that connect to the provided entrez id
 ```
 display_gene_report(entrez_id)
 ```
