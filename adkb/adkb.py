@@ -197,16 +197,16 @@ class ADKnowledgeBase:
         #Query templates to retrieve nodes that interact with given gene
         #If the end node matches the gene return start node
         q1_template = '''
-            MATCH(s:interactor)-[r:INTERACTS_WITH]->(e:interactor) WHERE e.name = '{}' RETURN s;
+            MATCH(s:interactor)-[r:INTERACTS_WITH*{}]->(e:interactor) WHERE e.name = '{}' RETURN s;
         '''
         #If the start node matches gene return end node
         q2_template = '''
-            MATCH(s:interactor)-[r:INTERACTS_WITH]->(e:interactor) WHERE s.name = '{}' RETURN e;
+            MATCH(s:interactor)-[r:INTERACTS_WITH*{}]->(e:interactor) WHERE s.name = '{}' RETURN e;
         '''
-        query1 = q1_template.format(entrez)
-        query2 = q2_template.format(entrez)
         for count in range(1,order+1):
             #Search for genes that interact with given gene
+            query1 = q1_template.format(count,entrez)
+            query2 = q2_template.format(count,entrez)
             interactors = []
             for n in self.graph.data(query1):
                 e_id = n['s']['name']
@@ -278,7 +278,8 @@ class ADKnowledgeBase:
         print("======================")
         print('N Order Results for',e_id)
         for order,interactors in interactor_orders.items():
-            print(order)
+            print("+++++++++++++++++")
+            print("++++ORDER",order,"+++++")
             for entrez_id in interactors:
                 print(entrez_id,":",self.find_name(entrez_id))
         print("=====================")

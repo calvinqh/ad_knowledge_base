@@ -16,12 +16,13 @@ def main():
 
         if press == 1:
             input_gene = input("ENTER A GENE: ")
+            input_order = int(input("ENTER ORDER: "))
             #all_genes = make_gene_table(entrez_and_genes)
             find_more = True
 
             while find_more:
                 gene_num = kb.find_id(input_gene)
-                kb.display_norder_genes(gene_num,1) 
+                kb.display_norder_genes(gene_num,input_order)
                 print()
                 print("Enter [0] to go BACK")
                 print("Enter [1] to enter a different GENE")
@@ -33,7 +34,7 @@ def main():
                     find_more = False
                 elif again == 1:
                     input_gene = input("ENTER A GENE: ")
-
+                    input_order = int(input("ENTER ORDER: "))
         elif press == 2:
             input_gene = input("ENTER A GENE: ")
             find_more = True
