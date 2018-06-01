@@ -1,7 +1,7 @@
 version: "3"
 services:
   web:
-    image: cardboardx/ADKB:latest
+    image: cardboardx/adkb:latest
     build: .
     ports:
         - "80:80"
@@ -11,15 +11,15 @@ services:
         - mong
         - neo
         - cass
-  mongo:
+  mong:
       image: mongo:3.4.15-jessie
-      container_name: ADKB-mong
+      container_name: adkb-mong
   neo:
       image: neo4j:3.4.0
-      container_name: ADKB-neo
+      container_name: adkb-neo
   cass:
       image: cassandra:3.0.16
-      container_name: ADKB-cass
+      container_name: adkb-cass
 networks:
   webnet:
 

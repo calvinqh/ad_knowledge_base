@@ -3,7 +3,7 @@ class DBConfig:
     @staticmethod
     def getMongoConfig():
         conf = {
-                'host':'localhost',
+                'host':'0.0.0.0',
                 'port':27017
         }
         
@@ -12,7 +12,7 @@ class DBConfig:
     @staticmethod
     def getCassandraConfig():
         conf = {
-            'host':'localhost',
+            'host':'0.0.0.0',
             'default_keyspace':'cqlengine'
         }
         return conf
@@ -22,7 +22,7 @@ class DBConfig:
         conf = {
             'user':'neo4j',
             'pw':'1',
-            'host':'localhost',
+            'host':'0.0.0.0',
             'http_port':11001,
             'db_name':'PPI',
             'graph_name':'interactors'
